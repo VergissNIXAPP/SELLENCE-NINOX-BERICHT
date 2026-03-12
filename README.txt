@@ -1,14 +1,13 @@
 NINOX BERICHT
 
 Neu in dieser Version:
-- Im Querformat passen 4 Buttons nebeneinander
-- Installierter WebApp-Name lautet jetzt: NINOX BERICHT
-- Rechte Zusammenfassung ist deutlich kleiner
-- Hauptansicht ist fast nur noch die Button-Seite
-- Button-Erstellen öffnet sich nur auf Wunsch als Overlay-Fenster
+- Lange Button-Texte verbreitern die Buttons nicht mehr
+- Text bricht jetzt sauber in mehrere Zeilen um
+- Schriftgröße ist kleiner und flexibler
+- Bearbeiten-Funktion eingebaut
+- Reihenfolge ändern direkt pro Button mit ← und →
 
 Start:
 1. ZIP entpacken
 2. index.html öffnen
-3. Über 'Button erstellen' den Editor öffnen
-4. FERTIG kopiert die Auswahl in die Zwischenablage
+3. Button erstellen oder vorhandene Buttons bearbeiten

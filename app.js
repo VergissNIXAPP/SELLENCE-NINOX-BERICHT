@@ -1,6 +1,8 @@
-const STORAGE_KEY = "sellenceNinoxButtonsV5";
+const STORAGE_KEY = "sellenceNinoxButtonsV6";
 const DRAWER_KEY = "ninoxCreatorOpen";
 const buttons = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+
+let editIndex = null;
 
 const buttonArea = document.getElementById("buttonArea");
 const reportText = document.getElementById("reportText");
@@ -14,6 +16,9 @@ const importInput = document.getElementById("importInput");
 const toggleCreatorBtn = document.getElementById("toggleCreatorBtn");
 const closeCreatorBtn = document.getElementById("closeCreatorBtn");
 const creatorDrawer = document.getElementById("creatorDrawer");
+const createBtn = document.getElementById("createBtn");
+const cancelEditBtn = document.getElementById("cancelEditBtn");
+const drawerTitle = document.getElementById("drawerTitle");
 
 function saveButtons(){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(buttons));
@@ -44,19 +49,39 @@ function renderButtons(){
     const cardBtn = fragment.querySelector(".smart-button");
     const label = fragment.querySelector(".smart-label");
     const deleteBtn = fragment.querySelector(".delete-btn");
+    const editBtn = fragment.querySelector(".edit-btn");
+    const moveLeftBtn = fragment.querySelector(".move-left-btn");
+    const moveRightBtn = fragment.querySelector(".move-right-btn");
 
     cardBtn.style.background = `linear-gradient(135deg, ${item.color}, ${shadeColor(item.color, -20)})`;
     cardBtn.textContent = item.label || item.text;
     label.textContent = item.text;
 
     cardBtn.addEventListener("click", () => addLine(item.text));
+
     deleteBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       if (confirm("Diesen Button wirklich löschen?")) {
         buttons.splice(index, 1);
         saveButtons();
         renderButtons();
+        if (editIndex === index) resetEditor();
       }
+    });
+
+    editBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      startEdit(index);
+    });
+
+    moveLeftBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      moveButton(index, -1);
+    });
+
+    moveRightBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      moveButton(index, 1);
     });
 
     buttonArea.appendChild(fragment);
@@ -70,7 +95,40 @@ function addLine(text){
   updateStats();
 }
 
-function createButton(){
+function openDrawer(){
+  creatorDrawer.classList.remove("hidden");
+  localStorage.setItem(DRAWER_KEY, "1");
+}
+
+function closeDrawer(){
+  creatorDrawer.classList.add("hidden");
+  localStorage.setItem(DRAWER_KEY, "0");
+}
+
+function resetEditor(){
+  editIndex = null;
+  btnText.value = "";
+  btnLabel.value = "";
+  btnColor.value = "#5b8cff";
+  createBtn.textContent = "+ Button hinzufügen";
+  drawerTitle.textContent = "Neuen Bericht-Button anlegen";
+  cancelEditBtn.classList.add("hidden");
+}
+
+function startEdit(index){
+  const item = buttons[index];
+  editIndex = index;
+  btnText.value = item.text;
+  btnLabel.value = item.label || "";
+  btnColor.value = item.color || "#5b8cff";
+  createBtn.textContent = "Änderungen speichern";
+  drawerTitle.textContent = "Button bearbeiten";
+  cancelEditBtn.classList.remove("hidden");
+  openDrawer();
+  btnText.focus();
+}
+
+function createOrUpdateButton(){
   const text = btnText.value.trim();
   const color = btnColor.value;
   const label = btnLabel.value.trim();
@@ -81,13 +139,29 @@ function createButton(){
     return;
   }
 
-  buttons.unshift({ text, color, label });
+  const payload = { text, color, label };
+
+  if (editIndex !== null){
+    buttons[editIndex] = payload;
+  } else {
+    buttons.unshift(payload);
+  }
+
+  saveButtons();
+  renderButtons();
+  resetEditor();
+  closeDrawer();
+}
+
+function moveButton(index, direction){
+  const target = index + direction;
+  if (target < 0 || target >= buttons.length) return;
+  [buttons[index], buttons[target]] = [buttons[target], buttons[index]];
   saveButtons();
   renderButtons();
 
-  btnText.value = "";
-  btnLabel.value = "";
-  btnText.focus();
+  if (editIndex === index) editIndex = target;
+  else if (editIndex === target) editIndex = index;
 }
 
 function copyReport(){
@@ -133,6 +207,7 @@ function importButtons(file){
       buttons.push(...cleaned);
       saveButtons();
       renderButtons();
+      resetEditor();
       alert("Buttons erfolgreich importiert.");
     } catch (e) {
       alert("Import fehlgeschlagen. Bitte eine gültige JSON-Datei verwenden.");
@@ -141,12 +216,8 @@ function importButtons(file){
   reader.readAsText(file);
 }
 
-function setDrawerOpen(isOpen){
-  creatorDrawer.classList.toggle("hidden", !isOpen);
-  localStorage.setItem(DRAWER_KEY, isOpen ? "1" : "0");
-}
-
-document.getElementById("createBtn").addEventListener("click", createButton);
+createBtn.addEventListener("click", createOrUpdateButton);
+cancelEditBtn.addEventListener("click", resetEditor);
 document.getElementById("finishBtn").addEventListener("click", copyReport);
 document.getElementById("undoBtn").addEventListener("click", () => {
   if (!reportText.value.trim()) return;
@@ -164,18 +235,19 @@ document.getElementById("clearReportBtn").addEventListener("click", () => {
 });
 document.getElementById("exportBtn").addEventListener("click", exportButtons);
 importInput.addEventListener("change", (event) => importButtons(event.target.files[0]));
-toggleCreatorBtn.addEventListener("click", () => setDrawerOpen(true));
-closeCreatorBtn.addEventListener("click", () => setDrawerOpen(false));
-
-btnText.addEventListener("keydown", (event) => {
-  if ((event.metaKey || event.ctrlKey) && event.key === "Enter") createButton();
+toggleCreatorBtn.addEventListener("click", () => openDrawer());
+closeCreatorBtn.addEventListener("click", () => {
+  closeDrawer();
+  resetEditor();
 });
 
-if (localStorage.getItem(DRAWER_KEY) === "1") {
-  setDrawerOpen(true);
-} else {
-  setDrawerOpen(false);
-}
+btnText.addEventListener("keydown", (event) => {
+  if ((event.metaKey || event.ctrlKey) && event.key === "Enter") createOrUpdateButton();
+});
 
+if (localStorage.getItem(DRAWER_KEY) === "1") openDrawer();
+else closeDrawer();
+
+resetEditor();
 renderButtons();
 updateStats();

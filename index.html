@@ -68,7 +68,7 @@
     <div class="drawer-head">
       <div>
         <p class="eyebrow">ERSTELLEN</p>
-        <h2>Neuen Bericht-Button anlegen</h2>
+        <h2 id="drawerTitle">Neuen Bericht-Button anlegen</h2>
       </div>
       <button class="ghost-btn" id="closeCreatorBtn" type="button">Schließen</button>
     </div>
@@ -88,19 +88,20 @@
 
           <label class="field compact">
             <span>Kurzname</span>
-            <input id="btnLabel" type="text" maxlength="24" placeholder="z. B. Nachräumen" />
+            <input id="btnLabel" type="text" maxlength="28" placeholder="z. B. Nachräumen" />
           </label>
         </div>
 
         <div class="cta-row">
           <button class="primary-btn" id="createBtn" type="button">+ Button hinzufügen</button>
+          <button class="secondary-btn hidden" id="cancelEditBtn" type="button">Bearbeiten abbrechen</button>
         </div>
       </div>
 
       <div class="tips">
         <span class="tip-chip">4 Buttons nebeneinander</span>
-        <span class="tip-chip">iPad Querformat optimiert</span>
-        <span class="tip-chip">Kleine Auswahlansicht</span>
+        <span class="tip-chip">Bearbeiten & Reihenfolge</span>
+        <span class="tip-chip">Text bricht sauber um</span>
       </div>
     </div>
   </section>
@@ -108,9 +109,12 @@
   <template id="buttonTemplate">
     <article class="smart-card">
       <button class="smart-button" type="button"></button>
-      <div class="smart-meta">
-        <span class="smart-label"></span>
-        <button class="delete-btn" type="button" title="Button löschen">✕</button>
+      <div class="smart-label"></div>
+      <div class="smart-actions">
+        <button class="mini-btn move-left-btn" type="button" title="Nach links">←</button>
+        <button class="mini-btn move-right-btn" type="button" title="Nach rechts">→</button>
+        <button class="mini-btn edit-btn" type="button" title="Bearbeiten">✎</button>
+        <button class="mini-btn delete-btn" type="button" title="Löschen">✕</button>
       </div>
     </article>
   </template>
