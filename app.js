@@ -1,5 +1,5 @@
-const STORAGE_KEY = "sellenceNinoxButtonsV4";
-const COLLAPSE_KEY = "sellenceNinoxCreatorCollapsed";
+const STORAGE_KEY = "sellenceNinoxButtonsV5";
+const DRAWER_KEY = "ninoxCreatorOpen";
 const buttons = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 
 const buttonArea = document.getElementById("buttonArea");
@@ -12,7 +12,8 @@ const lineCount = document.getElementById("lineCount");
 const template = document.getElementById("buttonTemplate");
 const importInput = document.getElementById("importInput");
 const toggleCreatorBtn = document.getElementById("toggleCreatorBtn");
-const restoreCreatorBtn = document.getElementById("restoreCreatorBtn");
+const closeCreatorBtn = document.getElementById("closeCreatorBtn");
+const creatorDrawer = document.getElementById("creatorDrawer");
 
 function saveButtons(){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(buttons));
@@ -22,6 +23,18 @@ function updateStats(){
   buttonCount.textContent = `${buttons.length} Button${buttons.length === 1 ? "" : "s"}`;
   const lines = reportText.value.trim() ? reportText.value.trim().split("\n").length : 0;
   lineCount.textContent = `${lines} Zeile${lines === 1 ? "" : "n"}`;
+}
+
+function shadeColor(hex, percent){
+  const clean = hex.replace("#", "");
+  const num = parseInt(clean, 16);
+  let r = (num >> 16) + percent;
+  let g = ((num >> 8) & 0x00FF) + percent;
+  let b = (num & 0x0000FF) + percent;
+  r = Math.max(Math.min(255, r), 0);
+  g = Math.max(Math.min(255, g), 0);
+  b = Math.max(Math.min(255, b), 0);
+  return "#" + (b | (g << 8) | (r << 16)).toString(16).padStart(6, "0");
 }
 
 function renderButtons(){
@@ -37,7 +50,8 @@ function renderButtons(){
     label.textContent = item.text;
 
     cardBtn.addEventListener("click", () => addLine(item.text));
-    deleteBtn.addEventListener("click", () => {
+    deleteBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
       if (confirm("Diesen Button wirklich löschen?")) {
         buttons.splice(index, 1);
         saveButtons();
@@ -78,14 +92,14 @@ function createButton(){
 
 function copyReport(){
   if (!reportText.value.trim()){
-    alert("Dein Bericht ist noch leer.");
+    alert("Deine Auswahl ist noch leer.");
     return;
   }
 
   navigator.clipboard.writeText(reportText.value).then(() => {
-    alert("Bericht kopiert. Jetzt kannst du direkt in Ninox einfügen.");
+    alert("Bericht kopiert. Jetzt in Ninox einfügen.");
   }).catch(() => {
-    alert("Kopieren hat nicht geklappt. Bitte manuell markieren und kopieren.");
+    alert("Kopieren hat nicht geklappt. Bitte manuell kopieren.");
   });
 }
 
@@ -94,7 +108,7 @@ function exportButtons(){
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `sellence-buttons-${new Date().toISOString().slice(0,10)}.json`;
+  a.download = `ninox-bericht-buttons-${new Date().toISOString().slice(0,10)}.json`;
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -127,22 +141,9 @@ function importButtons(file){
   reader.readAsText(file);
 }
 
-function shadeColor(hex, percent){
-  const clean = hex.replace("#", "");
-  const num = parseInt(clean, 16);
-  let r = (num >> 16) + percent;
-  let g = ((num >> 8) & 0x00FF) + percent;
-  let b = (num & 0x0000FF) + percent;
-  r = Math.max(Math.min(255, r), 0);
-  g = Math.max(Math.min(255, g), 0);
-  b = Math.max(Math.min(255, b), 0);
-  return "#" + (b | (g << 8) | (r << 16)).toString(16).padStart(6, "0");
-}
-
-function setCreatorCollapsed(collapsed){
-  document.body.classList.toggle("creator-collapsed", collapsed);
-  localStorage.setItem(COLLAPSE_KEY, collapsed ? "1" : "0");
-  toggleCreatorBtn.textContent = collapsed ? "Erstellen öffnen" : "Erstellen minimieren";
+function setDrawerOpen(isOpen){
+  creatorDrawer.classList.toggle("hidden", !isOpen);
+  localStorage.setItem(DRAWER_KEY, isOpen ? "1" : "0");
 }
 
 document.getElementById("createBtn").addEventListener("click", createButton);
@@ -156,24 +157,24 @@ document.getElementById("undoBtn").addEventListener("click", () => {
 });
 document.getElementById("clearReportBtn").addEventListener("click", () => {
   if (!reportText.value.trim()) return;
-  if (confirm("Kompletten Bericht leeren?")) {
+  if (confirm("Komplette Auswahl leeren?")) {
     reportText.value = "";
     updateStats();
   }
 });
 document.getElementById("exportBtn").addEventListener("click", exportButtons);
 importInput.addEventListener("change", (event) => importButtons(event.target.files[0]));
-toggleCreatorBtn.addEventListener("click", () => {
-  setCreatorCollapsed(!document.body.classList.contains("creator-collapsed"));
-});
-restoreCreatorBtn.addEventListener("click", () => setCreatorCollapsed(false));
+toggleCreatorBtn.addEventListener("click", () => setDrawerOpen(true));
+closeCreatorBtn.addEventListener("click", () => setDrawerOpen(false));
 
 btnText.addEventListener("keydown", (event) => {
   if ((event.metaKey || event.ctrlKey) && event.key === "Enter") createButton();
 });
 
-if (localStorage.getItem(COLLAPSE_KEY) === "1") {
-  setCreatorCollapsed(true);
+if (localStorage.getItem(DRAWER_KEY) === "1") {
+  setDrawerOpen(true);
+} else {
+  setDrawerOpen(false);
 }
 
 renderButtons();

@@ -1,6 +1,6 @@
 {
-  "name": "SELLENCE NINOX Bericht Pro",
-  "short_name": "SELLENCE NINOX",
+  "name": "NINOX BERICHT",
+  "short_name": "NINOX BERICHT",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0c1222",
