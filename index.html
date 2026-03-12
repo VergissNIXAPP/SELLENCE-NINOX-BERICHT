@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0c1222" />
+  <title>SELLENCE Tools – NINOX Bericht Pro</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar glass" id="topbar">
+      <div class="brand-wrap">
+        <div class="brand-badge">S</div>
+        <div>
+          <p class="eyebrow">SELLENCE TOOLS</p>
+          <h1>NINOX Bericht Pro</h1>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="ghost-btn" id="toggleCreatorBtn" type="button">Erstellen minimieren</button>
+        <button class="ghost-btn" id="clearReportBtn" type="button">Bericht leeren</button>
+        <button class="ghost-btn" id="exportBtn" type="button">Buttons exportieren</button>
+        <label class="ghost-btn import-label" for="importInput">Importieren</label>
+        <input id="importInput" type="file" accept="application/json" hidden />
+      </div>
+    </header>
+
+    <main class="layout" id="layout">
+      <section class="panel creator-panel glass" id="creatorPanel">
+        <div class="panel-head creator-head">
+          <div>
+            <p class="eyebrow">ERSTELLEN</p>
+            <h2>Neuen Bericht-Button anlegen</h2>
+            <p class="subcopy">Wenn minimiert, erweitert sich die Hauptseite automatisch nach links.</p>
+          </div>
+          <button class="ghost-btn mini-only" id="restoreCreatorBtn" type="button">Wieder öffnen</button>
+        </div>
+
+        <div class="creator-content" id="creatorContent">
+          <div class="form-grid">
+            <label class="field">
+              <span>Button-Text</span>
+              <textarea id="btnText" rows="4" placeholder="z. B. Ware nachgeräumt und Zweitplatzierung kontrolliert."></textarea>
+            </label>
+
+            <div class="row">
+              <label class="field compact">
+                <span>Farbe</span>
+                <input id="btnColor" type="color" value="#5b8cff" />
+              </label>
+
+              <label class="field compact">
+                <span>Kurzname</span>
+                <input id="btnLabel" type="text" maxlength="24" placeholder="z. B. Nachräumen" />
+              </label>
+            </div>
+
+            <div class="cta-row">
+              <button class="primary-btn" id="createBtn" type="button">+ Button hinzufügen</button>
+            </div>
+          </div>
+
+          <div class="tips">
+            <span class="tip-chip">Jeder Klick = neue Zeile</span>
+            <span class="tip-chip">Lokal gespeichert</span>
+            <span class="tip-chip">Schnell für Außendienst</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel buttons-panel glass" id="buttonsPanel">
+        <div class="panel-head sticky-head">
+          <div>
+            <p class="eyebrow">HAUPTSEITE</p>
+            <h2>Deine Schnellbausteine</h2>
+          </div>
+          <div class="focus-tools">
+            <div class="counter" id="buttonCount">0 Buttons</div>
+          </div>
+        </div>
+
+        <div class="buttons-grid" id="buttonArea"></div>
+      </section>
+
+      <section class="panel report-panel glass" id="reportPanel">
+        <div class="panel-head sticky-head">
+          <div>
+            <p class="eyebrow">BERICHT</p>
+            <h2>Zusammenfassung für Ninox</h2>
+          </div>
+          <div class="counter" id="lineCount">0 Zeilen</div>
+        </div>
+
+        <textarea id="reportText" class="report-text" placeholder="Hier entsteht dein Bericht…" readonly></textarea>
+
+        <div class="report-actions">
+          <button class="secondary-btn" id="undoBtn" type="button">Letzte Zeile entfernen</button>
+          <button class="finish-btn" id="finishBtn" type="button">FERTIG – Kopieren</button>
+        </div>
+
+        <p class="hint">Nach dem Kopieren kannst du direkt in Ninox wechseln und den Text einfügen.</p>
+      </section>
+    </main>
+  </div>
+
+  <template id="buttonTemplate">
+    <article class="smart-card">
+      <button class="smart-button" type="button"></button>
+      <div class="smart-meta">
+        <span class="smart-label"></span>
+        <button class="delete-btn" type="button" title="Button löschen">✕</button>
+      </div>
+    </article>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
